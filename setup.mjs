@@ -51,6 +51,64 @@ async function login(page, username, password){
    return true;
 }
 
+async function scrollAndFindElement(page, selector) {
+  const scrollIncrement = 100; // Adjust as needed
+  let scrollPosition = 0;
+  let elementFound = false;
+
+  while (!elementFound && scrollPosition < page.evaluate(() => document.body.scrollHeight)) {
+    await page.evaluate(y => window.scrollTo(0, y), scrollPosition);
+    await page.waitFor(100); // Add a slight delay for the page to render
+
+    const element = await page.$(selector);
+    if (element) {
+      elementFound = true;
+      break;
+    }
+
+    scrollPosition += scrollIncrement;
+  }
+
+  return elementFound;
+}
+
+async function configureSettings(page)
+{
+   if( !(await isLoggedIn(page) ) ){
+      console.log("Not logged in");
+      return false;
+   }
+
+   const settingsSelector = '#fpbx-menu-collapse > ul > li:nth-child(6)'
+   await page.waitForSelector(settingsSelector);
+   await page.hover(settingsSelector)
+
+   const advancedSettingsSelector = '#fpbx-menu-collapse > ul > li:nth-child(6) > ul > li:nth-child(1) > a';
+   await page.waitForSelector(advancedSettingsSelector);
+   await page.hover(advancedSettingsSelector);
+   await page.click(advancedSettingsSelector);
+
+   await delay(10000); //10 seconds
+
+   await page.screenshot({
+     path: '/srv/www/htdocs/allwrite/advancedSettings.png',
+   });
+
+   const launchAGIValueSelector = '#LAUNCH_AGI_AS_FASTAGIfalse';
+   await page.waitForSelector(launchAGIValueSelector);
+   const localAGIRadioElement = await page.$(launchAGIValueSelector);
+   const localAGIValue = await page.evaluate(el => el.value, localAGIRadioElement);
+
+   console.log("Launch Local AGI Value is: " + localAGIValue);
+   if( localAGIValue === "true" ) {
+      console.log("Launch Local AGI Value is true; we need to set it to false");
+      //TODO: Set setting to false
+      return false;
+   }
+
+   return true;
+}
+
 async function addExtensions(page)
 {
    if( !(await isLoggedIn(page) ) ){
@@ -117,8 +175,16 @@ async function setupFreePBX() {
 
    console.log("Logging in successful");
 
+   if( !(await configureSettings(page) ) ){
+      console.log("Setting configuration failed");
+      return;
+   }
+
+   console.log("Setting configuration successful");
+
    if( !(await addExtensions(page) ) ){
       console.log("Adding extension failed");
+      return;
    }
 
    console.log("Adding extensions successful");
