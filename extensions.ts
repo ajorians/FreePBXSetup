@@ -32,34 +32,18 @@ async function describeElementsByType(page, type) {
   return elementDescriptions;
 }
 
-async function hoverOverLinkByText(page, text) {
+async function getLinkWithText(page, text) {
    const links = await page.$$('a'); // Find all links on the page
 
    for(const link of links) {
       const textContent = await link.evaluate(el => el.textContent);
-      console.log("Link text: " + textContent);
+      //console.log("Link text: " + textContent);
       if( textContent === text ) {
-         await link.hover();
-         return true;
+         return link;
       }
    }
 
-   return false;
-}
-
-async function clickLinkByText(page, text) {
-   const links = await page.$$('a'); // Find all links on the page
-
-   for(const link of links) {
-      const textContent = await link.evaluate(el => el.textContent);
-      console.log("Link text: " + textContent);
-      if( textContent === text ) {
-         await link.click();
-         return true;
-      }
-   }
-
-   return false;
+   return null;
 }
 
 export async function addExtensions(page)
@@ -73,11 +57,13 @@ export async function addExtensions(page)
    //console.log(links);
 
    // Click Connectivity > Extensions
-   await hoverOverLinkByText(page, 'Connectivity');
+   const connectivityLink = await getLinkWithText(page, 'Connectivity');
+   connectivityLink.hover();
 
    await utils.takeScreenshot(page, "hoveredConnectivity.png");
 
-   await clickLinkByText(page, 'Extensions');
+   const extensionsLink = await getLinkWithText(page, 'Extensions');
+   extensionsLink.click();
 
    await utils.delay(4000);
  
