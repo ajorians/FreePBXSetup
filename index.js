@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer';
 import * as utils from './utils.ts';
+import * as login from './login.ts';
 
 async function getByText(page, text) {
   const elements = await page.$$('*');
@@ -67,74 +68,7 @@ async function describeElement(page, element) {
    console.log("IsVisible: " + isVisible);
 }
 
-async function moveMouseToCenter(page) {
-  // Get the dimensions of the viewport
-  const viewportDimensions = await page.evaluate(() => {
-    return {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    };
-  });
-
-  // Calculate the center coordinates
-  const centerX = viewportDimensions.width / 2;
-  const centerY = viewportDimensions.height / 2;
-
-  // Move the mouse to the center
-  await page.mouse.move(centerX, centerY);
-}
-
-async function findTextStartingWith(page, prefix) {
-  const elements = await page.evaluate((prefix) => {
-    const textElements = document.querySelectorAll('*');
-    return Array.from(textElements)
-      .filter(el => el.textContent.startsWith(prefix))
-      .map(el => el.textContent);
-  }, prefix);
-
-  return elements;
-}
-
-function getRemainderAfterPrefix(string, prefix) {
-  if (string.startsWith(prefix)) {
-    return string.slice(prefix.length);
-  } else {
-    return string;
-  }
-}
-
-async function isLoggedIn(page) {
-   if( !page ) {
-      console.log("Page is NULL.  Cannot continue");
-      return false;
-   }
-
-   await utils.takeScreenshot(page, "checkingLoggedIn.png");
-
-   await moveMouseToCenter(page);
-   await utils.delay(1000);
-
-   //const buttonDescriptions = await describeElementsByType(page, 'button');
-   //console.log(buttonDescriptions);
-
-   const gearSelector = '#settings-cog';
-   await page.waitForSelector(gearSelector);
-   await page.hover(gearSelector);
-   //await page.click(gearSelector);
-
-   const textElements = await findTextStartingWith(page, 'Hello,');
-   //console.log(textElements);  
-
-   for (const textElement of textElements) {
-      const username = getRemainderAfterPrefix(textElement, "Hello, ");
-      console.log("Logged in as: " + username);
-      return true;
-   }
- 
-   return false;
-}
-
-async function login(page, username, password){
+async function loginToSite(page, username, password){
    // Get the FreePBX Administration text
    const administrationTextElement = await getByText(page, 'FreePBX Administration');
    const textContent = await page.evaluate(el => el.textContent.trim(), administrationTextElement);
@@ -168,7 +102,7 @@ async function login(page, username, password){
 
    await utils.delay(10000);//10 seconds
 
-   return await isLoggedIn(page);
+   return await login.isLoggedIn(page);
 }
 
 async function scrollAndFindElement(page, selector) {
@@ -194,7 +128,7 @@ async function scrollAndFindElement(page, selector) {
 
 async function configureSettings(page)
 {
-   if( !(await isLoggedIn(page) ) ){
+   if( !(await login.isLoggedIn(page) ) ){
       console.log("Not logged in");
       return false;
    }
@@ -265,7 +199,7 @@ async function getElementByTypeAndText(page, type, text) {
 
 async function addExtensions(page)
 {
-   if( !(await isLoggedIn(page) ) ){
+   if( !(await login.isLoggedIn(page) ) ){
       console.log("Not logged in");
       return false;
    }
@@ -333,7 +267,7 @@ async function setupFreePBX() {
 
    console.log("Navigating to FreePBX site");
 
-   if( !(await login(page, 'admin', 'changemeaj') ) ){
+   if( !(await loginToSite(page, 'admin', 'changemeaj') ) ){
       console.log("Logging in failed");
       return;
    }
