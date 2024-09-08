@@ -1,10 +1,5 @@
 import puppeteer from 'puppeteer';
-
-function delay(time) {
-   return new Promise(function(resolve) { 
-       setTimeout(resolve, time)
-   });
-}
+import * as utils from './utils.js';
 
 async function getByText(page, text) {
   const elements = await page.$$('*');
@@ -84,7 +79,7 @@ async function takeScreenshot(page, filename) {
    console.log("Taking screenshot: " + screenshotPath);
 
    await page.screenshot({
-     path: '/srv/www/htdocs/allwrite/checkingLoggedIn.png',
+     path: screenshotPath
    });
 }
 
@@ -133,7 +128,7 @@ async function isLoggedIn(page) {
    await takeScreenshot(page, "checkingLoggedIn.png");
 
    await moveMouseToCenter(page);
-   await delay(1000);
+   await utils.delay(1000);
 
    //const buttonDescriptions = await describeElementsByType(page, 'button');
    //console.log(buttonDescriptions);
@@ -164,7 +159,7 @@ async function login(page, username, password){
    // Click FreePBX Administration button to login
    await page.click('#login_admin');
 
-   await delay(1000);
+   await utils.delay(1000);
 
    await takeScreenshot(page, "clickedLogin.png");
 
@@ -187,7 +182,7 @@ async function login(page, username, password){
 
    page.keyboard.press('Enter');
 
-   await delay(10000);//10 seconds
+   await utils.delay(10000);//10 seconds
 
    return await isLoggedIn(page);
 }
@@ -229,7 +224,7 @@ async function configureSettings(page)
    await page.hover(advancedSettingsSelector);
    await page.click(advancedSettingsSelector);
 
-   await delay(10000); //10 seconds
+   await utils.delay(10000); //10 seconds
 
    await takeScreenshot(page, "advancedSettings.png");
 
@@ -248,6 +243,42 @@ async function configureSettings(page)
    return true;
 }
 
+async function getLinksByText(page, text) {
+  const links = await page.$$('a'); // Find all links on the page
+
+  const matchingLinks = await page.evaluate((links, text) => {
+    return links.filter(link => link.textContent.includes(text));
+  }, links, text);
+
+  return matchingLinks;
+}
+
+async function getLinksByClassAndText(page, className, text) {
+  const links = await page.$$(className);
+
+  console.log("Got links: " + links);
+  for(const link of links) {
+   console.log("link as textcontent: " + link.textContent);
+  }
+
+  const matchingLinks = await page.evaluate((links, text) => {
+    return links.filter(link => link.textContent.includes(text));
+  }, links, text);
+
+  return matchingLinks;
+}
+
+async function getElementByTypeAndText(page, type, text) {
+   // Get all elements of the specified type
+   const elements = await page.$$(type);
+
+   const matchingElements = await page.evaluate((elements, text) => {
+    return elements.filter(element => element.textContent.includes(text));
+  }, elements, text);
+
+  return matchingElements;
+}
+
 async function addExtensions(page)
 {
    if( !(await isLoggedIn(page) ) ){
@@ -255,34 +286,53 @@ async function addExtensions(page)
       return false;
    }
 
+   //const links = await describeElementsByType(page, 'a');
+   //console.log(links);
+
    // Click Connectivity > Extensions
-   const connectivityelement = await page.waitForSelector('#fpbx-menu-collapse > ul > li:nth-child(3)');
-   await page.hover('#fpbx-menu-collapse > ul > li:nth-child(3)');
+   const connectivityLink = await getElementByTypeAndText(page, 'a', 'Connectivity')[0];
+   await describeElement(page, connectivityLink);
+   await page.hover(connectivityLink);
 
    await takeScreenshot(page, "hoveredConnectivity.png");
 
-   await page.waitForSelector('#fpbx-menu-collapse > ul > li:nth-child(3) > ul > li:nth-child(2) > a');
-   await page.hover('#fpbx-menu-collapse > ul > li:nth-child(3) > ul > li:nth-child(2) > a');
+   const extensionsLink = await getElementByTypeAndText(page, 'a', 'Extensions')[0];
+   await describeElement(page, extensionsLink);
+   await page.click(extensionsLink);
 
-   await page.screenshot({
-     path: '/srv/www/htdocs/allwrite/hoveredExtensions.png',
-   });
-
-   await page.click('#fpbx-menu-collapse > ul > li:nth-child(3) > ul > li:nth-child(2) > a');
-
-   await takeScreenshot(page, "clickedExtensions.png");
-
-   await page.waitForSelector('#bt-add-ex > button');
-   await page.click('#bt-add-ex > button');
-
-   await takeScreenshot(page, "hoveredAddExtension.png");
-
-   await page.waitForSelector('#bt-add-ex > ul > li:nth-child(1) > a > strong');
-   await page.click('#bt-add-ex > ul > li:nth-child(1) > a > strong');
-
-   await takeScreenshot(page, "clickedAddNewSipExtension.png");
+   await utils.delay(1000);
+ 
+   await takeScreenshot(page, "extensions.png");
 
    return true;
+
+//   const connectivityelement = await page.waitForSelector('#fpbx-menu-collapse > ul > li:nth-child(3)');
+//   await page.hover('#fpbx-menu-collapse > ul > li:nth-child(3)');
+
+//   await takeScreenshot(page, "hoveredConnectivity.png");
+
+//   await page.waitForSelector('#fpbx-menu-collapse > ul > li:nth-child(3) > ul > li:nth-child(2) > a');
+//   await page.hover('#fpbx-menu-collapse > ul > li:nth-child(3) > ul > li:nth-child(2) > a');
+
+//   await page.screenshot({
+//     path: '/srv/www/htdocs/allwrite/hoveredExtensions.png',
+//   });
+
+//   await page.click('#fpbx-menu-collapse > ul > li:nth-child(3) > ul > li:nth-child(2) > a');
+
+//   await takeScreenshot(page, "clickedExtensions.png");
+
+//   await page.waitForSelector('#bt-add-ex > button');
+//   await page.click('#bt-add-ex > button');
+
+//   await takeScreenshot(page, "hoveredAddExtension.png");
+
+//   await page.waitForSelector('#bt-add-ex > ul > li:nth-child(1) > a > strong');
+//   await page.click('#bt-add-ex > ul > li:nth-child(1) > a > strong');
+
+//   await takeScreenshot(page, "clickedAddNewSipExtension.png");
+
+//   return true;
 }
 
 async function setupFreePBX() {
