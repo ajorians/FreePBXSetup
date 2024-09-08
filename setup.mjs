@@ -67,22 +67,6 @@ async function describeElement(page, element) {
    console.log("IsVisible: " + isVisible);
 }
 
-async function takeScreenshot(page, filename) {
-   if( !page ) {
-      console.log("Page is NULL.  Cannot continue");
-      return;
-   }
-
-   const path = "/srv/www/htdocs/allwrite/";
-   const screenshotPath = path + filename;
-
-   console.log("Taking screenshot: " + screenshotPath);
-
-   await page.screenshot({
-     path: screenshotPath
-   });
-}
-
 async function moveMouseToCenter(page) {
   // Get the dimensions of the viewport
   const viewportDimensions = await page.evaluate(() => {
@@ -125,7 +109,7 @@ async function isLoggedIn(page) {
       return false;
    }
 
-   await takeScreenshot(page, "checkingLoggedIn.png");
+   await utils.takeScreenshot(page, "checkingLoggedIn.png");
 
    await moveMouseToCenter(page);
    await utils.delay(1000);
@@ -161,7 +145,7 @@ async function login(page, username, password){
 
    await utils.delay(1000);
 
-   await takeScreenshot(page, "clickedLogin.png");
+   await utils.takeScreenshot(page, "clickedLogin.png");
 
    const usernameElement = await page.$('input[type="text"][name="username"]');
 
@@ -178,7 +162,7 @@ async function login(page, username, password){
 
    await page.type('xpath//html/body/div[15]/div[2]/form/div[2]/input', password);
 
-   await takeScreenshot(page, "enteredCredentials.png");
+   await utils.takeScreenshot(page, "enteredCredentials.png");
 
    page.keyboard.press('Enter');
 
@@ -226,7 +210,7 @@ async function configureSettings(page)
 
    await utils.delay(10000); //10 seconds
 
-   await takeScreenshot(page, "advancedSettings.png");
+   await utils.takeScreenshot(page, "advancedSettings.png");
 
    const launchAGIValueSelector = '#LAUNCH_AGI_AS_FASTAGIfalse';
    await page.waitForSelector(launchAGIValueSelector);
@@ -294,7 +278,7 @@ async function addExtensions(page)
    await describeElement(page, connectivityLink);
    await page.hover(connectivityLink);
 
-   await takeScreenshot(page, "hoveredConnectivity.png");
+   await utils.takeScreenshot(page, "hoveredConnectivity.png");
 
    const extensionsLink = await getElementByTypeAndText(page, 'a', 'Extensions')[0];
    await describeElement(page, extensionsLink);
@@ -302,7 +286,7 @@ async function addExtensions(page)
 
    await utils.delay(1000);
  
-   await takeScreenshot(page, "extensions.png");
+   await utils.takeScreenshot(page, "extensions.png");
 
    return true;
 
