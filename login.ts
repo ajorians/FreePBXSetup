@@ -67,4 +67,51 @@ export async function isLoggedIn(page) {
    return false;
 }
 
+async function getByText(page, text) {
+  const elements = await page.$$('*');
+  for (const element of elements) {
+    const elementText = await element.evaluate(el => el.textContent);
+    if (elementText === text) {
+      return element;
+    }
+  }
+  return null; // Element not found
+}
+
+export async function loginToSite(page, username, password){
+   // Get the FreePBX Administration text
+   const administrationTextElement = await getByText(page, 'FreePBX Administration');
+   const textContent = await page.evaluate(el => el.textContent.trim(), administrationTextElement);
+   console.log("Label text: " + textContent);
+
+   // Click FreePBX Administration button to login
+   await page.click('#login_admin');
+
+   await utils.delay(1000);
+
+   await utils.takeScreenshot(page, "clickedLogin.png");
+
+   const usernameElement = await page.$('input[type="text"][name="username"]');
+
+   //await describeElement(page, usernameElement);
+
+   if( !usernameElement )
+   {
+      console.log("No username element");
+      return false;
+   }
+
+   await usernameElement.focus();
+   await usernameElement.type(username);
+
+   await page.type('xpath//html/body/div[15]/div[2]/form/div[2]/input', password);
+
+   await utils.takeScreenshot(page, "enteredCredentials.png");
+
+   page.keyboard.press('Enter');
+
+   await utils.delay(10000);//10 seconds
+
+   return await isLoggedIn(page);
+}
 

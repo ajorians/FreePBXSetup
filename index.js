@@ -2,17 +2,6 @@ import puppeteer from 'puppeteer';
 import * as utils from './utils.ts';
 import * as login from './login.ts';
 
-async function getByText(page, text) {
-  const elements = await page.$$('*');
-  for (const element of elements) {
-    const elementText = await element.evaluate(el => el.textContent);
-    if (elementText === text) {
-      return element;
-    }
-  }
-  return null; // Element not found
-}
-
 async function describeElementsByType(page, type) {
   // Get all elements of the specified type
   const elements = await page.$$(type);
@@ -66,43 +55,6 @@ async function describeElement(page, element) {
 
    const isVisible = await element.isVisible();
    console.log("IsVisible: " + isVisible);
-}
-
-async function loginToSite(page, username, password){
-   // Get the FreePBX Administration text
-   const administrationTextElement = await getByText(page, 'FreePBX Administration');
-   const textContent = await page.evaluate(el => el.textContent.trim(), administrationTextElement);
-   console.log("Label text: " + textContent);
-
-   // Click FreePBX Administration button to login
-   await page.click('#login_admin');
-
-   await utils.delay(1000);
-
-   await utils.takeScreenshot(page, "clickedLogin.png");
-
-   const usernameElement = await page.$('input[type="text"][name="username"]');
-
-   //await describeElement(page, usernameElement);
-
-   if( !usernameElement )
-   {
-      console.log("No username element");
-      return false;
-   }
-
-   await usernameElement.focus();
-   await usernameElement.type(username);
-
-   await page.type('xpath//html/body/div[15]/div[2]/form/div[2]/input', password);
-
-   await utils.takeScreenshot(page, "enteredCredentials.png");
-
-   page.keyboard.press('Enter');
-
-   await utils.delay(10000);//10 seconds
-
-   return await login.isLoggedIn(page);
 }
 
 async function scrollAndFindElement(page, selector) {
@@ -267,7 +219,7 @@ async function setupFreePBX() {
 
    console.log("Navigating to FreePBX site");
 
-   if( !(await loginToSite(page, 'admin', 'changemeaj') ) ){
+   if( !(await login.loginToSite(page, 'admin', 'changemeaj') ) ){
       console.log("Logging in failed");
       return;
    }
