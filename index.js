@@ -25,12 +25,12 @@ async function setupFreePBX() {
 
    console.log("Logging in successful");
 
-   if( !(await settings.configureSettings(page) ) ){
-      console.log("Setting configuration failed");
-      return;
-   }
+//   if( !(await settings.configureSettings(page) ) ){
+//      console.log("Setting configuration failed");
+//      return;
+//   }
 
-   console.log("Setting configuration successful");
+//   console.log("Setting configuration successful");
 
    if( !(await extensions.addExtensions(page) ) ){
       console.log("Adding extension failed");
