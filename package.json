@@ -1,0 +1,29 @@
+{
+  "name": "freepbxsetup",
+  "version": "1.0.0",
+  "description": "Script to configure FreePBX",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajorians/FreePBXSetup.git"
+  },
+  "keywords": [
+    "FreePBX"
+  ],
+  "author": "A.J. Orians",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/ajorians/FreePBXSetup/issues"
+  },
+  "homepage": "https://github.com/ajorians/FreePBXSetup#readme",
+  "dependencies": {
+    "puppeteer": "^23.3.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}
