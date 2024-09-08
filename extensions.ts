@@ -46,6 +46,21 @@ async function getLinkWithText(page, text) {
    return null;
 }
 
+async function getButtonsWithText(page, text) {
+  const buttons = await page.$$('button'); // Use the appropriate selector for your case
+
+  // Filter and click the button based on its text content
+  for (let button of buttons) {
+    const buttonText = await page.evaluate(el => el.textContent.trim(), button);
+    if (buttonText.includes( text )) { // Replace with the text you're looking for
+      console.log("Foun button: " + buttonText );
+      return button;
+    }
+  }
+
+  return null;
+}
+
 export async function addExtensions(page)
 {
    if( !(await login.isLoggedIn(page) ) ){
@@ -68,6 +83,13 @@ export async function addExtensions(page)
    await utils.delay(4000);
  
    await utils.takeScreenshot(page, "extensions.png");
+
+   const button = await getButtonsWithText(page, "Add Extension");
+   await button.click();
+
+   await utils.delay(4000);
+
+   await utils.takeScreenshot(page, "addextensions.png");
 
    return true;
 }
