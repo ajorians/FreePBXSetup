@@ -48,25 +48,33 @@ async function getLinkWithText(page, text) {
    return null;
 }
 
-export async function addExtensions(page)
-{
-   if( !(await login.isLoggedIn(page) ) ){
-      console.log("Not logged in");
-      return false;
+async function hasSIPExtension(page, extensionNumber) {
+   await page.waitForSelector('#table-all > tbody');
+
+   const extensionRows = await page.evaluate(() => {
+      const rows = Array.from(document.querySelectorAll('#table-all tbody tr'));
+
+      return rows.map(row => {
+         const column = row.querySelectorAll('td')[1]; // Second column (0-based index)
+         return column ? column.innerText.trim() : null;
+      }).filter(text => text !== null);
+   });
+
+   for( const row of extensionRows ){
+      if( row == extensionNumber ) {
+         return true;
+      }
    }
 
-   // Click Connectivity > Extensions
-   const connectivityLink = await getLinkWithText(page, 'Connectivity');
-   connectivityLink.hover();
+   return false;
+}
 
-   await utils.takeScreenshot(page, "hoveredConnectivity.png");
-
-   const extensionsLink = await getLinkWithText(page, 'Extensions');
-   extensionsLink.click();
-
-   await utils.delay(4000);
- 
-   await utils.takeScreenshot(page, "extensions.png");
+async function addSIPExtension(page, extensionNumber, extensionName)
+{
+   if( await hasSIPExtension(page, extensionNumber) ){
+      console.log("Has extension: " + extensionNumber);
+      return true;
+   }
 
    const addExtButton = await buttons.getButtonsWithText(page, "Add Extension");
    await addExtButton.click();
@@ -94,7 +102,7 @@ export async function addExtensions(page)
    }
 
    await userExtensionElement.focus();
-   await userExtensionElement.type('201');
+   await userExtensionElement.type(extensionNumber);
 
    const displayNameElement = await page.$('input[type="text"][name="name"]');
 
@@ -105,13 +113,38 @@ export async function addExtensions(page)
    }
 
    await displayNameElement.focus();
-   await displayNameElement.type('Desktop');
+   await displayNameElement.type(extensionName);
 
    await utils.takeScreenshot(page, "addedextensions.png");
 
    await page.click('#submit');
 
    await reload.reloadConfig( page );
+
+   return true;
+}
+
+export async function addExtensions(page)
+{
+   if( !(await login.isLoggedIn(page) ) ){
+      console.log("Not logged in");
+      return false;
+   }
+
+   // Click Connectivity > Extensions
+   const connectivityLink = await getLinkWithText(page, 'Connectivity');
+   connectivityLink.hover();
+
+   await utils.takeScreenshot(page, "hoveredConnectivity.png");
+
+   const extensionsLink = await getLinkWithText(page, 'Extensions');
+   extensionsLink.click();
+
+   await utils.delay(4000);
+ 
+   await utils.takeScreenshot(page, "extensions.png");
+
+   await addSIPExtension(page, "201", "Desktop");
 
    return true;
 }
