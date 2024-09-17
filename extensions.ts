@@ -1,5 +1,7 @@
 import * as utils from './utils.ts';
+import * as buttons from './buttons.ts';
 import * as login from './login.ts';
+import * as reload from './reload.ts';
 
 async function describeElementsByType(page, type) {
   // Get all elements of the specified type
@@ -46,21 +48,6 @@ async function getLinkWithText(page, text) {
    return null;
 }
 
-async function getButtonsWithText(page, text) {
-  const buttons = await page.$$('button'); // Use the appropriate selector for your case
-
-  // Filter and click the button based on its text content
-  for (let button of buttons) {
-    const buttonText = await page.evaluate(el => el.textContent.trim(), button);
-    //console.log("ButtonText: " + buttonText);
-    if (buttonText.includes( text )) { // Replace with the text you're looking for
-      return button;
-    }
-  }
-
-  return null;
-}
-
 export async function addExtensions(page)
 {
    if( !(await login.isLoggedIn(page) ) ){
@@ -81,7 +68,7 @@ export async function addExtensions(page)
  
    await utils.takeScreenshot(page, "extensions.png");
 
-   const addExtButton = await getButtonsWithText(page, "Add Extension");
+   const addExtButton = await buttons.getButtonsWithText(page, "Add Extension");
    await addExtButton.click();
 
    await utils.delay(4000);
@@ -123,6 +110,8 @@ export async function addExtensions(page)
    await utils.takeScreenshot(page, "addedextensions.png");
 
    await page.click('#submit');
+
+   await reload.reloadConfig( page );
 
    return true;
 }
