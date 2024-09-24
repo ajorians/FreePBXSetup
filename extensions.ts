@@ -144,7 +144,9 @@ export async function addExtensions(page)
  
    await utils.takeScreenshot(page, "extensions.png");
 
-   await addSIPExtension(page, "201", "Desktop");
+   if( !(await addSIPExtension(page, "201", "Desktop") ) ) {
+      return false;
+   }
 
    return true;
 }

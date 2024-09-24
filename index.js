@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer';
 import * as utils from './utils.ts';
 import * as login from './login.ts';
 import * as extensions from './extensions.ts';
+import * as ringgroups from './ringgroups.ts';
 import * as settings from './settings.ts';
 
 async function setupFreePBX() {
@@ -38,6 +39,13 @@ async function setupFreePBX() {
    }
 
    console.log("Adding extensions successful");
+
+   if( !(await ringgroups.addRingGroups(page) ) ){
+      console.log("Adding ring groups failed");
+      return;
+   }
+
+   console.log("Adding ring groups successful");
 
    await browser.close();
 }

@@ -12,4 +12,3 @@ export async function getButtonsWithText(page, text) {
 
   return null;
 }
-
