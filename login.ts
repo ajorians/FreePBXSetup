@@ -108,7 +108,7 @@ export async function loginToSite(page, username, password){
 
    await utils.takeScreenshot(page, "enteredCredentials.png");
 
-   page.keyboard.press('Enter');
+   await page.keyboard.press('Enter');
 
    await utils.delay(10000);//10 seconds
 

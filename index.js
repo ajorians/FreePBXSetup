@@ -4,6 +4,7 @@ import * as login from './login.ts';
 import * as extensions from './extensions.ts';
 import * as ringgroups from './ringgroups.ts';
 import * as settings from './settings.ts';
+import * as siptrunks from './siptrunks.ts';
 
 async function setupFreePBX() {
    const browser = await puppeteer.launch({executablePath: '/usr/bin/chromium'});
@@ -46,6 +47,13 @@ async function setupFreePBX() {
    }
 
    console.log("Adding ring groups successful");
+
+   if( !(await siptrunks.addSIPTrunks(page) ) ){
+      console.log("Adding SIP trunks failed");
+      return;
+   }
+
+   console.log("Adding SIP trunks successful");
 
    await browser.close();
 }
