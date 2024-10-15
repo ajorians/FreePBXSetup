@@ -38,12 +38,13 @@ async function hasSIPTrunk(page, trunkName) {
       const rows = Array.from(document.querySelectorAll('#table-all tbody tr'));
 
       return rows.map(row => {
-         const column = row.querySelectorAll('td')[1]; // Second column (0-based index)
+         const column = row.querySelectorAll('td')[0]; // First column (0-based index)
          return column ? column.innerText.trim() : null;
       }).filter(text => text !== null);
    });
 
    for( const row of trunkRows ){
+      //console.log("row: " + row);
       if( row == trunkName ) {
          return true;
       }
