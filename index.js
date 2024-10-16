@@ -6,6 +6,7 @@ import * as ringgroups from './ringgroups.ts';
 import * as settings from './settings.ts';
 import * as siptrunks from './siptrunks.ts';
 import * as inboundroutes from './inboundroutes.ts';
+import * as outboundroutes from './outboundroutes.ts';
 
 async function setupFreePBX() {
    const browser = await puppeteer.launch({executablePath: '/usr/bin/chromium'});
@@ -62,6 +63,13 @@ async function setupFreePBX() {
    }
 
    console.log("Adding Inbound Routes successful");
+
+   if( !(await outboundroutes.addOutboundRoutes(page) ) ){
+      console.log("Adding Outbound Routes failed");
+      return;
+   }
+
+   console.log("Adding Outbound Routes successful");
 
    await browser.close();
 }
