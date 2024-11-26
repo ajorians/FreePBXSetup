@@ -2,6 +2,7 @@ import * as utils from './utils.ts';
 import * as buttons from './buttons.ts';
 import * as login from './login.ts';
 import * as reload from './reload.ts';
+import * as variables from './variables.ts';
 
 async function getLinkWithText(page, text) {
    const links = await page.$$('a'); // Find all links on the page
@@ -188,7 +189,7 @@ export async function addSIPTrunks(page)
  
    await utils.takeScreenshot(page, "trunks.png");
 
-   if( !(await addSIPTrunk(page, "Voip.ms", "chicago4.voip.ms", "5173480350", "374782", "0G&)ynqfMnqA") ) ) {
+   if( !(await addSIPTrunk(page, "Voip.ms", "chicago4.voip.ms", variables.trunknumber, variables.trunkaccount, variables.trunkpassword) ) ) {
       return false;
    }
 

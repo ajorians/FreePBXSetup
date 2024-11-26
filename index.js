@@ -7,6 +7,7 @@ import * as settings from './settings.ts';
 import * as siptrunks from './siptrunks.ts';
 import * as inboundroutes from './inboundroutes.ts';
 import * as outboundroutes from './outboundroutes.ts';
+import * as variables from './variables.ts';
 
 async function setupFreePBX() {
    const browser = await puppeteer.launch({executablePath: '/usr/bin/chromium'});
@@ -18,11 +19,11 @@ async function setupFreePBX() {
        height: 1080
      });
 
-   await page.goto('https://asteriskpi.orians.org/');
+   await page.goto(variables.server);
 
    console.log("Navigating to FreePBX site");
 
-   if( !(await login.loginToSite(page, 'admin', 'changemeaj') ) ){
+   if( !(await login.loginToSite(page, variables.user, variables.password) ) ){
       console.log("Logging in failed");
       return;
    }
