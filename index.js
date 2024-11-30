@@ -23,7 +23,7 @@ async function setupFreePBX() {
 
    console.log("Navigating to FreePBX site");
 
-   if( !(await login.loginToSite(page, variables.user, variables.password) ) ){
+   if( !(await login.loginToSite(page, variables.username, variables.password) ) ){
       console.log("Logging in failed");
       return;
    }
