@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+
 export function delay(time) {
    return new Promise(function(resolve) {
        setTimeout(resolve, time)
@@ -10,13 +12,15 @@ export async function takeScreenshot(page, filename) {
       return;
    }
 
-   const path = "/srv/www/htdocs/allwrite/";
-   const screenshotPath = path + filename;
+   const dirpath = "/tmp/";
+   if( fs.existsSync( dirpath ) ){
+      const screenshotPath = dirpath + filename;
 
-   console.log("Taking screenshot: " + screenshotPath);
+      console.log("Taking screenshot: " + screenshotPath);
 
-   await page.screenshot({
-     path: screenshotPath
-   });
+      await page.screenshot({
+        path: screenshotPath
+      });
+   }
 }
 

@@ -10,7 +10,7 @@ import * as outboundroutes from './outboundroutes.ts';
 import * as variables from './variables.ts';
 
 async function setupFreePBX() {
-   const browser = await puppeteer.launch({executablePath: '/usr/bin/chromium'});
+   const browser = await puppeteer.launch({executablePath: '/usr/bin/google-chrome'});
 
    const page = await browser.newPage();
 
@@ -37,12 +37,16 @@ async function setupFreePBX() {
 
 //   console.log("Setting configuration successful");
 
+   console.log("Adding extensions");
+
    if( !(await extensions.addExtensions(page) ) ){
       console.log("Adding extension failed");
       return;
    }
 
    console.log("Adding extensions successful");
+
+   console.log("Adding ring groups");
 
    if( !(await ringgroups.addRingGroups(page) ) ){
       console.log("Adding ring groups failed");
@@ -51,6 +55,8 @@ async function setupFreePBX() {
 
    console.log("Adding ring groups successful");
 
+   console.log("Adding SIP Trunks");
+
    if( !(await siptrunks.addSIPTrunks(page) ) ){
       console.log("Adding SIP trunks failed");
       return;
@@ -58,12 +64,16 @@ async function setupFreePBX() {
 
    console.log("Adding SIP trunks successful");
 
+   console.log("Addding inbound routes");
+
    if( !(await inboundroutes.addInboundRoutes(page) ) ){
       console.log("Adding Inbound Routes failed");
       return;
    }
 
    console.log("Adding Inbound Routes successful");
+
+   console.log("Adding outbound routes");
 
    if( !(await outboundroutes.addOutboundRoutes(page) ) ){
       console.log("Adding Outbound Routes failed");

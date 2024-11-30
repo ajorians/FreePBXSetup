@@ -61,6 +61,7 @@ async function addSIPTrunk(page, trunkName, sipServer, phoneNumber, username, pa
       return true;
    }
 
+   console.log("Adding trunk");
    const addTrunkButton = await buttons.getButtonsWithText(page, "Add Trunk");
    await addTrunkButton.click();
 
@@ -68,6 +69,7 @@ async function addSIPTrunk(page, trunkName, sipServer, phoneNumber, username, pa
 
    await utils.takeScreenshot(page, "addtrunks.png");
 
+   console.log("Adding SIP (chan_pjsip) Trunk");
    const addSIPTrunkLink = await getLinkWithText(page, 'Add SIP (chan_pjsip) Trunk');
    addSIPTrunkLink.click();
 

@@ -3,3 +3,6 @@ package-lock.json
 ./package.json
 ./package-lock.json
 node_modules/
+
+# Often has passwords
+variables.js
