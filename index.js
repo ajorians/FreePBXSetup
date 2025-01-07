@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer';
 import * as utils from './utils.ts';
+import * as initialsetup from './initialsetup.ts';
 import * as login from './login.ts';
 import * as extensions from './extensions.ts';
 import * as ringgroups from './ringgroups.ts';
@@ -8,9 +9,28 @@ import * as siptrunks from './siptrunks.ts';
 import * as inboundroutes from './inboundroutes.ts';
 import * as outboundroutes from './outboundroutes.ts';
 import * as variables from './variables.ts';
+import * as fs from 'fs';
+
+async function getBrowerPath() {
+   const chromePath = "/usr/bin/google-chrome";
+   if( fs.existsSync( chromePath ) ){
+      console.log("Using Chrome");
+      return chomePath;
+   }
+   const chromiumPath = "/usr/bin/chromium";
+   if( fs.existsSync( chromiumPath ) ){
+      console.log("Using Chromium");
+      return chromiumPath;
+   }
+
+   console.log("Unable to find a suitable browser");
+   return "";
+}
 
 async function setupFreePBX() {
-   const browser = await puppeteer.launch({executablePath: '/usr/bin/google-chrome'});
+   const browserPath = await getBrowerPath();
+
+   const browser = await puppeteer.launch({executablePath: browserPath});
 
    const page = await browser.newPage();
 
@@ -23,12 +43,31 @@ async function setupFreePBX() {
 
    console.log("Navigating to FreePBX site");
 
+   if( await initialsetup.isAtInitialSetup(page) ) {
+      console.log("Initial setup");
+      if( await initialsetup.setup(page, variables.username, variables.password, "ajorians@gmail.com", "Asterisk PI") ) {
+         console.log("Setup successful");
+      } else {
+         console.log("Setup failed");
+      }
+   }
+
    if( !(await login.loginToSite(page, variables.username, variables.password) ) ){
       console.log("Logging in failed");
       return;
    }
 
    console.log("Logging in successful");
+
+   if( await initialsetup.isAtDefaultLocales(page) ) {
+      console.log("DefaultLocales");
+      if( await initialsetup.setupDefaultLocales(page) ) {
+         console.log("Setup Default Locales Successful");
+      } else {
+         console.log("Setup Default Locales Failed");
+      }
+      return;
+   }
 
 //   if( !(await settings.configureSettings(page) ) ){
 //      console.log("Setting configuration failed");
