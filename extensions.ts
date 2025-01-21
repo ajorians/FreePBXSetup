@@ -2,6 +2,7 @@ import * as utils from './utils.ts';
 import * as buttons from './buttons.ts';
 import * as login from './login.ts';
 import * as reload from './reload.ts';
+import * as variables from './variables.ts';
 
 async function describeElementsByType(page, type) {
   // Get all elements of the specified type
@@ -69,7 +70,7 @@ async function hasSIPExtension(page, extensionNumber) {
    return false;
 }
 
-async function addSIPExtension(page, extensionNumber, extensionName)
+async function addSIPExtension(page, extensionNumber, extensionName, extensionPassword)
 {
    if( await hasSIPExtension(page, extensionNumber) ){
       console.log("Has extension: " + extensionNumber);
@@ -144,8 +145,16 @@ export async function addExtensions(page)
  
    await utils.takeScreenshot(page, "extensions.png");
 
-   if( !(await addSIPExtension(page, "201", "Desktop") ) ) {
-      return false;
+   for( const deviceExt of variables.deviceextensions ){
+      const number = deviceExt[0];
+      const name = deviceExt[1];
+      const password = deviceExt[2];
+
+      console.log("Extension: " + number + " name: " + name + " password: " + password);
+      if( !(await addSIPExtension(page, number, name, password) ) ) {
+         console.log("Trouble adding extension");
+         return false;
+      }
    }
 
    return true;
