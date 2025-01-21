@@ -191,8 +191,18 @@ export async function addSIPTrunks(page)
  
    await utils.takeScreenshot(page, "trunks.png");
 
-   if( !(await addSIPTrunk(page, "Voip.ms", "chicago4.voip.ms", variables.trunknumber, variables.trunkaccount, variables.trunkpassword) ) ) {
-      return false;
+   for( const sipExt of variables.sipextensions ){
+      const trunkName = sipExt[0];
+      const sipServer = sipExt[1];
+      const phonenumber = sipExt[2];
+      const username = sipExt[3];
+      const password = sipExt[4];
+
+      console.log("Trunk: " + trunkName + " SIPServer: " + sipServer + " username: " + username + " password: " + password);
+      if( !(await addSIPTrnk(page, trunkName, sipServer, phonenumber, username, password) ) ) {
+         console.log("Trouble adding SIP trunk");
+         return false;
+      }
    }
 
    return true;
