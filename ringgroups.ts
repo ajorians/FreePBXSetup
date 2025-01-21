@@ -2,6 +2,7 @@ import * as utils from './utils.ts';
 import * as buttons from './buttons.ts';
 import * as login from './login.ts';
 import * as reload from './reload.ts';
+import * as variables from './variables.ts';
 
 async function getLinkWithText(page, text) {
    const links = await page.$$('a'); // Find all links on the page
@@ -137,8 +138,16 @@ export async function addRingGroups(page)
  
    await utils.takeScreenshot(page, "ringGroups.png");
 
-   if( !await addRingGroup(page, "200", "Test Ring Group", ["201"]) ) {
-      return false;
+   for( const deviceExt of variables.ringgroups ){
+      const number = deviceExt[0];
+      const name = deviceExt[1];
+      const exts = deviceExt[2];
+
+      console.log("Extension: " + number + " name: " + name + " extensions: " + exts);
+      if( !(await addRingGroup(page, number, name, exts) ) ) {
+         console.log("Trouble adding ring group");
+         return false;
+      }
    }
 
    return true;
