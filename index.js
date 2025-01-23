@@ -15,7 +15,7 @@ async function getBrowerPath() {
    const chromePath = "/usr/bin/google-chrome";
    if( fs.existsSync( chromePath ) ){
       console.log("Using Chrome");
-      return chomePath;
+      return chromePath;
    }
    const chromiumPath = "/usr/bin/chromium";
    if( fs.existsSync( chromiumPath ) ){
