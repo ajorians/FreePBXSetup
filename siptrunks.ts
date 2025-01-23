@@ -198,8 +198,8 @@ export async function addSIPTrunks(page)
       const username = sipExt[3];
       const password = sipExt[4];
 
-      console.log("Trunk: " + trunkName + " SIPServer: " + sipServer + " username: " + username + " password: " + password);
-      if( !(await addSIPTrnk(page, trunkName, sipServer, phonenumber, username, password) ) ) {
+      console.log("Trunk: " + trunkName + " SIPServer: " + sipServer + "phone num:" + phonenumber + " username: " + username + " password: " + password);
+      if( !(await addSIPTrunk(page, trunkName, sipServer, phonenumber, username, password) ) ) {
          console.log("Trouble adding SIP trunk");
          return false;
       }
