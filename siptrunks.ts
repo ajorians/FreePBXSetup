@@ -191,7 +191,7 @@ export async function addSIPTrunks(page)
  
    await utils.takeScreenshot(page, "trunks.png");
 
-   for( const sipExt of variables.sipextensions ){
+   for( const sipExt of variables.siptrunks ){
       const trunkName = sipExt[0];
       const sipServer = sipExt[1];
       const phonenumber = sipExt[2];
