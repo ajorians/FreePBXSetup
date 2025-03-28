@@ -8,6 +8,7 @@ import * as settings from './settings.ts';
 import * as siptrunks from './siptrunks.ts';
 import * as inboundroutes from './inboundroutes.ts';
 import * as outboundroutes from './outboundroutes.ts';
+import * as iaxsettings from './iaxsettings.ts';
 import * as variables from './variables.ts';
 import * as fs from 'fs';
 
@@ -77,6 +78,11 @@ async function setupFreePBX() {
 //   console.log("Setting configuration successful");
 
    console.log("Adding extensions");
+
+   if( !(await iaxsettings.configureIAXSettings(page) ) ){
+      console.log("Configuring IAX settings failed");
+      return;
+   }
 
    if( !(await extensions.addExtensions(page) ) ){
       console.log("Adding extension failed");
