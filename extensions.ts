@@ -116,6 +116,28 @@ async function addSIPExtension(page, extensionNumber, extensionName, extensionPa
    await displayNameElement.focus();
    await displayNameElement.type(extensionName);
 
+   const secretElement = 'input[name=devinfo_secret]';
+   if( !secretElement )
+   {
+      console.log("No secret element");
+      return false;
+   }
+
+   await page.evaluate((selector, password) => {
+    const textbox = document.querySelector(selector);
+    if (textbox) {
+      textbox.value = ''; // Clear existing text
+      textbox.focus();
+      textbox.value = password; // Type the new text
+    }
+    else
+    {
+      console.log("Not textbox");
+    }
+  }, secretElement, extensionPassword);
+
+  await utils.delay(2000);
+
    await utils.takeScreenshot(page, "addedextensions.png");
 
    await page.click('#submit');
